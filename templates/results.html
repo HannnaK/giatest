@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <title>Wyniki</title>
 </head>
 <body>
 
+<h1>liczba udzielonych odpowiedzi {{ number_of_answers }}</h1>
+<h1>Błędne odpowiedzi</h1>
+ <ul> {%for w in wrong_answers%}
+  <li>{{w}}</li>
+  {%endfor%}
+</ul>
+<meta HTTP-EQUIV="REFRESH" content="3; /results">
+<a href='/'> Strona główna </a>
 </body>
 </html>
