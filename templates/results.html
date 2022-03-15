@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Wyniki</title>
+    <meta charset="UTF-8">
+    <title>Wyniki</title>
 </head>
 <body>
 
-<h1>liczba udzielonych odpowiedzi {{ number_of_answers }}</h1>
-<h1>Błędne odpowiedzi</h1>
- <ul> {%for w in wrong_answers%}
-  <li>{{w}}</li>
-  {%endfor%}
+<h1>Pytania</h1>
+<ul> {%for a in answers_reasoning%}
+    <li>Twierdzenie: {{a[1]}} Pytanie: {{a[2]}} Prawidłowa odp. {{a[3]}}
+        {%if a[4]==0%}
+        Twoja odp. błędna
+        {%else%}
+        Twoja odp. prawidłowa
+        {%endif%}
+    </li>
+    {%endfor%}
 </ul>
 <meta HTTP-EQUIV="REFRESH" content="3; /results">
 <a href='/'> Strona główna </a>
