@@ -5,6 +5,39 @@
     <title>Porównywanie</title>
 </head>
 <body>
-<h1>in preparation</h1>
+<div class="container">
+         <div class="row">
+
+            <div class="col-md-9">
+        <table>
+            <tr>
+                <th>{{ item.letter1 }}</th>
+                <th>{{ item.letter2 }}</th>
+                <th>{{ item.letter3 }}</th>
+                <th>{{ item.letter4 }}</th>
+            </tr>
+            <tr>
+                <th>{{ item.letter5 }}</th>
+                <th>{{ item.letter6 }}</th>
+                <th>{{ item.letter7 }}</th>
+                <th>{{ item.letter8 }}</th>
+            </tr>
+        </table>
+                <div>
+                    <form method="post" action="">
+                    <div>
+                        <input type="submit" class="btn btn-info" value="0" name="answer">
+                        <input type="submit" class="btn btn-info" value="1" name="answer">
+                        <input type="submit" class="btn btn-info" value="2" name="answer">
+                        <input type="submit" class="btn btn-info" value="3" name="answer">
+                        <input type="submit" class="btn btn-info" value="4" name="answer">
+                    </div>
+                    </form>
+                </div>
+                <a href='/results'> Wyniki </a>
+
+         </div>
+      </div>
+      </div>
 </body>
 </html>

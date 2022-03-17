@@ -11,8 +11,10 @@ def run_script_sql(script):
 
 
 run_script_sql('migrations\\1_reasoning.sql')
+run_script_sql('migrations\\2_compare_items.sql')
 run_script_sql('migrations\\users.sql')
 run_script_sql('migrations\\answers_reasoning.sql')
+run_script_sql('migrations\\answers_compare_items.sql')
 
 conn.commit()
 
