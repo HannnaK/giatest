@@ -1,7 +1,7 @@
 import sqlite3
 import random
 from flask import Flask, get_flashed_messages, flash, session, render_template, request, redirect
-from giaTestClass import Reasoning, Compare_items
+from giaTestClass import Reasoning
 from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
@@ -102,43 +102,25 @@ def reasoning():
 
 item_selected_list = []
 
+
+conn = get_connection()
+c = conn.cursor()
+query= c.execute('SELECT * FROM "compare_items"')
+data = query.fetchall()
+
+
 @app.route('/compare_items', methods=['GET', 'POST'], endpoint='compare_items')
 @login_required
 def compare_items():
-        if request.method == 'GET':
-            item_selected = Compare_items.select_random()
-            item = Compare_items(item_selected[0], item_selected[1], item_selected[2], item_selected[3],
-                                 item_selected[4], item_selected[5], item_selected[6], item_selected[7], item_selected[8], item_selected[9])
-            item_selected_list.append(item)
-            print(item)
-            return render_template('compare_items.html', item=item)
+    return render_template('compare_items.html')
 
-        if request.method == 'POST':
-            answer = request.form.get("answer")
-            print('1', answer)
-            item = item_selected_list[-1]
-            id_user = session['user_id']
-            # answer = item.check_answer(answer)
+@app.route('/compare_items/data', methods=['GET', 'POST'])
+def index():
+    # data_sufle = random.shuffle(data)
+    data_dict = [dict(q) for q in data]
 
-            conn = get_connection()
-            c = conn.cursor()
-
-            conn.commit()
-
-            quiry = """
-            INSERT INTO "answers_compare_items" ("id_user", "id_compare_items", "your_answer") VALUES (?, ?, ?)
-            """
-            parameters = (id_user, item.id, answer)
-
-            c.execute(quiry, parameters)
-
-            conn.commit()
-            conn.close()
-
-            return redirect('/compare_items')
-
-
-
+    questions = dict({"compare_items": data_dict})
+    return questions
 
 @app.route('/results', endpoint='results')
 @login_required
