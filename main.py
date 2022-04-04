@@ -1,6 +1,6 @@
 import sqlite3
 import random
-from flask import Flask, get_flashed_messages, flash, session, render_template, request, redirect
+from flask import Flask, get_flashed_messages, flash, session, render_template, request, redirect, json
 from giaTestClass import Reasoning
 from werkzeug.security import check_password_hash
 
@@ -89,7 +89,7 @@ def reasoning():
         conn.commit()
 
         quiry = """
-        INSERT INTO "answers_reasoning" ("id_user", "id_reasoning", "is_answer_correct") VALUES (?, ?, ?)
+        INSERT INTO "answers_reasoning" ("id_user", "id_reasoning", "is_answer_correct") VALUES (?, ?, ?);
         """
         parameters = (id_user, question.id, answer)
 
@@ -114,13 +114,47 @@ data = query.fetchall()
 def compare_items():
     return render_template('compare_items.html')
 
-@app.route('/compare_items/data', methods=['GET', 'POST'])
+@app.route('/compare_items/questions', methods=['GET', 'POST'])
 def index():
     # data_sufle = random.shuffle(data)
     data_dict = [dict(q) for q in data]
 
     questions = dict({"compare_items": data_dict})
     return questions
+
+@app.route('/compare_items/answers', methods=['POST'])
+def test():
+    output = request.get_json()
+    result = json.loads(output)
+    conn = sqlite3.connect('base.db')
+    c = conn.cursor()
+
+    query1 = '''
+    SELECT MAX(tests_number) FROM "answers_compare_items" WHERE id_user=?;
+    '''
+
+    id_user = int(session['user_id'])
+    c.execute(query1, (id_user,))
+
+    number = c.fetchone()
+
+    if number[0] == None:
+        tests_number = 0
+    else:
+        tests_number = number[0]
+
+    for i in result['qa']:
+
+        quiry2 = """
+                INSERT INTO "answers_compare_items" ("id_user", "tests_number", "id_compare_items", "my_answer") VALUES (?, ?, ?, ?)
+                """
+        parameters = (id_user, (tests_number+1), i['id'], i['my_answer'])
+        c.execute(quiry2, parameters)
+
+    conn.commit()
+    conn.close()
+
+    return result
 
 @app.route('/results', endpoint='results')
 @login_required
@@ -144,7 +178,7 @@ def results():
 
     c2 = conn.cursor()
     quiry2 = """
-    SELECT ci.id, ci.letter1, ci.letter2,  ci.letter3, ci.letter4, ci.letter5, ci.letter6,  ci.letter7, ci.letter8, ci.correct_answer, aci.your_answer FROM "compare_items" AS ci
+    SELECT ci.id, ci.letter1, ci.letter2,  ci.letter3, ci.letter4, ci.letter5, ci.letter6,  ci.letter7, ci.letter8, ci.correct_answer, aci.my_answer FROM "compare_items" AS ci
     LEFT JOIN "answers_compare_items" AS aci 
     ON ci.id=aci.id_compare_items
     LEFT JOIN "users" AS u

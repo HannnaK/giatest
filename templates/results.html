@@ -20,9 +20,9 @@
 <ul> {%for a in answers_compare_items%}
     <li>litery: [{{a[1]}}, {{a[2]}}, {{a[3]}}, {{a[4]}}], [{{a[5]}}, {{a[6]}}, {{a[7]}}, {{a[8]}}] Prawidłowa odp. {{a[9]}}
         {%if a[9]!=a[10]%}
-        Twoja odp. błędna
+        Twoja odp. {{a[10]}} błędna
         {%else%}
-        Twoja odp. prawidłowa
+        Twoja odp. {{a[10]}} prawidłowa
         {%endif%}
     </li>
     {%endfor%}

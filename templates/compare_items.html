@@ -2,13 +2,13 @@
 <html>
 
 <head>
-	<title>Quiz Application</title>
+	<title>GIA Test</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
 		integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
 		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
 		crossorigin="anonymous"></script>
-
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
@@ -66,15 +66,17 @@
 				<!-- Result Page -->
 				<div id="Result">
 					<h3 class="mt-4"> Liczba prawidłowych odpowiedzi: <span id="count_correct_answer"></span></h3>
-					<h3 class="mt-4">Liczba pytań: <span id="correct_answer"></span></h3>
+					<h3 class="mt-4">Liczba pytań: <span id="question">+1</span></h3>
 					<h3 class="mt-4">Result : <span id="percentage">100%</span></h3>
+
+						<a href='/' class="btn btn-success float-right"> Strona główna </a>
+
 				</div>
 
 			</div>
 
 		</div>
 	</div>
-
 	<script>
 
 
@@ -85,6 +87,7 @@
 		var count_correct_answer = 0;
 		var answer = [];
 		var timer;
+		var selected_questions = []
 
 		//    Main Ready funtion
 
@@ -115,7 +118,7 @@
 			function selected_Answer() {
 				for (var i = 0; i < 4; i++) {
 					var a = document.getElementById("options").children;
-					if (a[i].innerHTML == answer[count_questions]) {
+					if (a[i].innerHTML == answer[i]) {
 						$("#options").children("button")[i].classList.add("active");
 					}
 					else {
@@ -124,19 +127,35 @@
 				}
 			}
 
+
 			function creating_result(questions) {
 				for (var i = 0; i < answer.length; i++) {
 					if (answer[i] == questions.compare_items[i].correct_answer) {
 
 						count_correct_answer += 1;
 					}
+					var selected_question = questions.compare_items[i];
+					selected_question["my_answer"] = answer[i];
+					selected_questions.push(selected_question);
+
 				}
+
+				var dict_values = {qa: selected_questions}
+				const selected_question_json = JSON.stringify(dict_values);
+
+				$.ajax({
+					url:"/compare_items/answers",
+					type:"POST",
+					contentType: "application/json",
+					data: JSON.stringify(selected_question_json)});
+
+
 				console.log(answer)
 				$('#main').hide();
 
 				$("#count_correct_answer").text(count_correct_answer);
-				$('#correct_answer').text(count_questions);
-				$('#percentage').text(count_correct_answer * 100 / count_questions + "%");
+				$("#question").text(count_questions + 1);
+				$("#percentage").text(count_correct_answer * 100 / (count_questions + 1) + "%");
 
 				$("#Result").show();
 			}
@@ -144,7 +163,7 @@
 
 			// Attach API
 
-			fetch('/compare_items/data')
+			fetch('/compare_items/questions')
 				.then(function (response) {
 					return response.json();
 				})
@@ -160,7 +179,7 @@
 							$('#time').text(time);
 							if (time < 1) {
 								clearInterval(timer);
-								alert("Koniecz czasu");
+								alert("Koniec czasu");
 								creating_result(questions);
 								$("#main").hide();
 								$("#result").show();
@@ -190,16 +209,11 @@
 							adding_Questions(questions.compare_items, count_questions);
 
 							$(".option").removeClass("active");
-							buttons_manager();
 							selected_Answer();
 						}
 					});
 
-
 				})
-
-
-
 
 		})
 
