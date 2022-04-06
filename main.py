@@ -1,7 +1,6 @@
 import sqlite3
 import random
 from flask import Flask, get_flashed_messages, flash, session, render_template, request, redirect, json
-from giaTestClass import Reasoning
 from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
@@ -63,51 +62,65 @@ def login_required(view):
 def welcome():
     return render_template('welcome.html')
 
-
-questions_selected_list = []
-
 @app.route('/reasoning/', methods=['GET', 'POST'], endpoint='reasoning')
 @login_required
 def reasoning():
-    if request.method == 'GET':
-        question_selected = Reasoning.select_random()
-        question = Reasoning(question_selected[0], question_selected[1], question_selected[2], question_selected[3],
-                             question_selected[4])
-        questions_selected_list.append(question)
-        answer1, answer2 = random.sample([question.answer1, question.answer2], 2)
-        return render_template('reasoning.html', question=question, answer1=answer1, answer2=answer2)
-
-    if request.method == 'POST':
-        answer = request.form.get("answer")
-        question = questions_selected_list[-1]
-        id_user = session['user_id']
-        answer = question.check_answer(answer)
-
-        conn = get_connection()
-        c = conn.cursor()
-
-        conn.commit()
-
-        quiry = """
-        INSERT INTO "answers_reasoning" ("id_user", "id_reasoning", "is_answer_correct") VALUES (?, ?, ?);
-        """
-        parameters = (id_user, question.id, answer)
-
-        c.execute(quiry, parameters)
-
-        conn.commit()
-        conn.close()
-
-        return redirect('/reasoning/')
-
-item_selected_list = []
+    return render_template('reasoning.html')
 
 
 conn = get_connection()
 c = conn.cursor()
-query= c.execute('SELECT * FROM "compare_items"')
-data = query.fetchall()
+query1= c.execute('SELECT * FROM "reasoning"')
+data1 = query1.fetchall()
 
+@app.route('/reasoning/questions', methods=['GET', 'POST'])
+def reasoning_questions():
+    # data_sufle = random.shuffle(data1)
+    data_dict = [dict(q) for q in data1]
+
+    questions = dict({"reasoning": data_dict})
+    return questions
+
+@app.route('/reasoning/answers', methods=['POST'])
+def reasoning_answers():
+    output = request.get_json()
+    result = json.loads(output)
+    conn = sqlite3.connect('base.db')
+    c = conn.cursor()
+
+    query1 = '''
+    SELECT MAX(tests_number) FROM "answers_reasoning" WHERE id_user=?;
+    '''
+
+    id_user = int(session['user_id'])
+    c.execute(query1, (id_user,))
+
+    number = c.fetchone()
+
+    if number[0] == None:
+        tests_number = 0
+    else:
+        tests_number = number[0]
+
+    for i in result['qa']:
+
+        quiry2 = """
+                INSERT INTO "answers_reasoning" ("id_user", "tests_number", "id_reasoning", "my_answer") VALUES (?, ?, ?, ?)
+                """
+        parameters = (id_user, (tests_number+1), i['id'], i['my_answer'])
+        c.execute(quiry2, parameters)
+
+    conn.commit()
+    conn.close()
+
+    return result
+
+
+
+conn = get_connection()
+c = conn.cursor()
+query2= c.execute('SELECT * FROM "compare_items"')
+data2 = query2.fetchall()
 
 @app.route('/compare_items', methods=['GET', 'POST'], endpoint='compare_items')
 @login_required
@@ -115,15 +128,15 @@ def compare_items():
     return render_template('compare_items.html')
 
 @app.route('/compare_items/questions', methods=['GET', 'POST'])
-def index():
+def compare_items_questions():
     # data_sufle = random.shuffle(data)
-    data_dict = [dict(q) for q in data]
+    data_dict = [dict(q) for q in data2]
 
     questions = dict({"compare_items": data_dict})
     return questions
 
 @app.route('/compare_items/answers', methods=['POST'])
-def test():
+def compare_items_answers():
     output = request.get_json()
     result = json.loads(output)
     conn = sqlite3.connect('base.db')
@@ -162,8 +175,8 @@ def results():
     conn = sqlite3.connect('base.db')
     c1 = conn.cursor()
     quiry1 = """
-    SELECT r.id, r.statement, r.query,  r.answer1, ar.is_answer_correct FROM "reasoning" AS r
-    LEFT JOIN "answers_reasoning" AS ar 
+    SELECT r.id, r.statement, r.query,  r.correct_answer, ar.my_answer FROM "reasoning" AS r
+    LEFT JOIN "answers_reasoning" AS ar
     ON r.id=ar.id_reasoning
     LEFT JOIN "users" AS u
     ON ar.id_user=u.id
@@ -175,6 +188,7 @@ def results():
     answers_reasoning = []
     for questions in c1:
         answers_reasoning.append(questions)
+        print(questions)
 
     c2 = conn.cursor()
     quiry2 = """
@@ -185,7 +199,6 @@ def results():
     ON aci.id_user=u.id
     WHERE aci.id_user=?
     """
-    id_user = int(session['user_id'])
     c2.execute(quiry2, (id_user,))
 
 

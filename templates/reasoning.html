@@ -1,48 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>GIA Test</title>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-     <script>
-         function before(){
+<head>
+	<title>GIA Test</title>
+    <meta charset="UTF-8">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
 
-             document.getElementById('message')
-             .innerHTML="{{question.statement}}";
-         }
 
-         function afterr(){
+<body>
 
-             document.getElementById('message')
-             .innerHTML="{{question.query}}";
-         }
-      </script>
+	<div class="container mt-5">
+		<h5 class="card-text float-right font-weight-bold">Czas : (00: <span id="time">00</span>)</h5>
 
-   </head>
-   <body>
-      <div class="container">
-         <div class="row">
+		<!-- First Page -->
+		<div class="row d-flex justify-content-center">
+			<div class="col-md-8 border p-4">
+				<div id="first">
+					<div class="card-body">
+						<h5 class="card-text-center">GIA Test</h5>
+					</div>
+					<hr>
 
-            <div class="col-md-9">
-               <h1 id="message">
-                   {{question.statement}}
-               </h1>
-               <button  class="btn btn-light btn-lg" onclick=afterr();>Pytanie</button>
-                <div>
-                    <form method="post" action="">
-                    <div>
-                        <input type="submit" class="btn btn-info" value="{{answer1}}" name="answer">
-                        <input type="submit" class="btn btn-info" value="{{answer2}}" name="answer">
-                    </div>
-                    </form>
-                </div>
-                <a href='/results'> Wyniki </a>
+					<div class="start_page">
+						<h3 class="text-center mb-5">Rozumowanie</h3>
+						<p class="text-center">Test polega na wyciąganiu wniosków i odpowiadaniu na pytania. w każdym przykładzie porównane są dwie osoby; np. kto jest cięższy lub lżejszy, silniejszy lub słabszy od drugiej osoby</p>
+						<button class="btn btn-success d-flex mx-auto mt-4 btn-lg" id="btn">Prozpocznij test</button>
+					</div>
+				</div>
+				<!-- QUiz Page -->
 
-         </div>
-      </div>
-      </div>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+				<div id="main">
+					<div class="card-body">
+					<div class="card-body">
+						<button  class="btn btn-light btn-lg" id="question_statement"></button>
+					</div>
 
-   </body>
+					</div>
+					<div class="col-md-12 text-center" id="options">
+						<button class="btn btn-light btn-outline-success text option" id="options1"></button>
+						<button class="btn btn-light btn-outline-success text option" id="options2"></button>
+						<div class="footer p-4">
+							<button class="btn btn-success float-right" id="next">Dalej</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Result Page -->
+				<div id="Result">
+					<h3 class="mt-4"> Liczba prawidłowych odpowiedzi: <span id="count_correct_answer"></span></h3>
+					<h3 class="mt-4">Liczba pytań: <span id="question">+1</span></h3>
+					<h3 class="mt-4">Result : <span id="percentage">100%</span></h3>
+
+						<a href='/' class="btn btn-success float-right"> Strona główna </a>
+
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+	<script>
+
+		// Variables
+
+		var count_questions = 0;
+		var time = 15;
+		var count_correct_answer = 0;
+		var answer = [];
+		var timer;
+		var selected_questions = []
+
+		//    Main Ready funtion
+
+		$(document).ready(function () {
+			$('#Result').hide();
+			$('#next').show();
+
+			// Create Question Function
+			function adding_Questions(questions, i) {
+				$('#question_statement').text(questions[i].statement)
+				document.getElementById("question_statement").addEventListener("click", after);
+
+				function after() {
+				  document.getElementById("question_statement").innerHTML = (questions[i].query);
+				}
+
+				$('#options1').text(questions[i].answer1)
+				$('#options2').text(questions[i].answer2)
+
+			}
+
+			// Answer Selection Function
+
+			function selected_Answer() {
+				for (var i = 0; i < 2; i++) {
+					var a = document.getElementById("options").children;
+					if (a[i].innerHTML == answer[i]) {
+						$("#options").children("button")[i].classList.add("active");
+					}
+					else {
+						$("#options").children("button")[i].classList.remove("active");
+					}
+				}
+			}
+
+
+			function creating_result(questions) {
+				for (var i = 0; i < answer.length; i++) {
+					if (answer[i] == questions.reasoning[i].correct_answer) {
+
+						count_correct_answer += 1;
+					}
+					var selected_question = questions.reasoning[i];
+					selected_question["my_answer"] = answer[i];
+					selected_questions.push(selected_question);
+
+				}
+				console.log(selected_questions)
+				var dict_values = {qa: selected_questions}
+				const selected_question_json = JSON.stringify(dict_values);
+
+				$.ajax({
+					url:"/reasoning/answers",
+					type:"POST",
+					contentType: "application/json",
+					data: JSON.stringify(selected_question_json)});
+
+
+				console.log(answer)
+				$('#main').hide();
+
+				$("#count_correct_answer").text(count_correct_answer);
+				$("#question").text(count_questions + 1);
+				$("#percentage").text(count_correct_answer * 100 / (count_questions + 1) + "%");
+
+				$("#Result").show();
+			}
+			$("#options").hide();
+
+			// Attach API
+
+			fetch('/reasoning/questions')
+				.then(function (response) {
+					return response.json();
+				})
+				.then(function (questions) {
+					$('#btn').click(function () {
+						$('#options').show();
+						adding_Questions(questions.reasoning, count_questions);
+						$('.start_page').hide();
+
+						timer = setInterval(timer_function, 1000);
+
+						function timer_function() {
+							$('#time').text(time);
+							if (time < 1) {
+								clearInterval(timer);
+								alert("Koniec czasu");
+								creating_result(questions);
+								$("#main").hide();
+								$("#result").show();
+							}
+							time--;
+						}
+
+					});
+
+					// Select Option
+
+					$(".option").click(function () {
+
+						$(this).addClass("active");
+						$(this).siblings().removeClass("active");
+						answer[count_questions] = $(this).html();
+					});
+
+					// Next Questions
+
+					$('#next').click(function () {
+						if (count_questions > answer.length - 1) {
+							alert("Nie zaznaczono odpowiedzi!")
+						}
+						else {
+							count_questions++;
+							adding_Questions(questions.reasoning, count_questions);
+
+							$(".option").removeClass("active");
+							selected_Answer();
+						}
+					});
+
+				})
+
+		})
+
+
+	</script>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+		integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"
+		integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF"
+		crossorigin="anonymous"></script>
+
+</body>
+
 </html>
