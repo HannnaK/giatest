@@ -9,10 +9,10 @@
 <h1>Pytania</h1>
 <ul> {%for a in answers_reasoning%}
     <li>Twierdzenie: {{a[1]}} Pytanie: {{a[2]}} Prawidłowa odp. {{a[3]}}
-        {%if a[4]==0%}
-        Twoja odp. błędna
+        {% if a[3]==a[4] %}
+        Twoja odp. {{ a[4] }} prawidłowa
         {%else%}
-        Twoja odp. prawidłowa
+        Twoja odp. {{ a[4] }} błędna
         {%endif%}
     </li>
     {%endfor%}
