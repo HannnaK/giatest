@@ -14,22 +14,18 @@ CREATE TABLE "compare_items"
     "correct_answer" INTEGER NOT NULL
 );
 INSERT INTO "compare_items"
-VALUES (NULL, "M", "B", "T", "D", "f", "j", "g", "p", 0);
-INSERT INTO "compare_items"
-VALUES (NULL, "Y", "W", "Z", "H", "t", "w", "j", "h", 2);
-INSERT INTO "compare_items"
-VALUES (NULL, "n", "m", "f", "y", "N", "M", "B", "Y", 3);
-INSERT INTO "compare_items"
-VALUES (NULL, "k", "p", "r", "w", "K", "P", "R", "W", 4);
-INSERT INTO "compare_items"
-VALUES (NULL, "N", "M", "J", "B", "m", "n", "g", "b", 3);
-INSERT INTO "compare_items"
-VALUES (NULL, "t", "p", "f", "y", "T", "Z", "M", "K", 1);
-INSERT INTO "compare_items"
-VALUES (NULL, "N", "B", "G", "W", "j", "b", "g", "y", 2);
-INSERT INTO "compare_items"
-VALUES (NULL, "f", "n", "m", "k", "H", "W", "J", "B", 0);
-INSERT INTO "compare_items"
-VALUES (NULL, "g", "d", "r", "t", "M", "D", "Z", "N", 1);
-INSERT INTO "compare_items"
-VALUES (NULL, "Y", "B", "G", "R", "w", "j", "f", "z", 0);
+VALUES (NULL, "M", "B", "T", "D", "f", "j", "g", "p", 0),
+(NULL, "Y", "W", "Z", "H", "t", "w", "j", "h", 2),
+(NULL, "n", "m", "f", "y", "N", "M", "B", "Y", 3),
+(NULL, "k", "p", "r", "w", "K", "P", "R", "W", 4),
+(NULL, "N", "M", "J", "B", "m", "n", "g", "b", 3),
+(NULL, "t", "p", "f", "y", "T", "Z", "M", "K", 1),
+(NULL, "N", "B", "G", "W", "j", "b", "g", "y", 2),
+(NULL, "f", "n", "m", "k", "H", "W", "J", "B", 0),
+(NULL, "g", "d", "r", "t", "M", "D", "Z", "N", 1),
+(NULL, "Y", "B", "G", "R", "w", "j", "f", "z", 0),
+(NULL, "K", "H", "M", "N", "k", "d", "m", "n", 3),
+(NULL, "Y", "J", "H", "B", "f", "w", "d", "p", 0),
+(NULL, "z", "g", "r", "m", "Z", "G", "R", "M", 4),
+(NULL, "D", "J", "H", "N", "b", "j", "h", "n", 3);
+
