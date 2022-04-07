@@ -188,7 +188,6 @@ def results():
     answers_reasoning = []
     for questions in c1:
         answers_reasoning.append(questions)
-        print(questions)
 
     c2 = conn.cursor()
     quiry2 = """
