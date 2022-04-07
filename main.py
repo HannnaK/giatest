@@ -175,7 +175,7 @@ def results():
     conn = sqlite3.connect('base.db')
     c1 = conn.cursor()
     quiry1 = """
-    SELECT r.id, r.statement, r.query,  r.correct_answer, ar.my_answer FROM "reasoning" AS r
+    SELECT r.id, r.statement, r.query,  r.correct_answer, ar.my_answer, ar.tests_number FROM "reasoning" AS r
     LEFT JOIN "answers_reasoning" AS ar
     ON r.id=ar.id_reasoning
     LEFT JOIN "users" AS u
@@ -191,7 +191,7 @@ def results():
 
     c2 = conn.cursor()
     quiry2 = """
-    SELECT ci.id, ci.letter1, ci.letter2,  ci.letter3, ci.letter4, ci.letter5, ci.letter6,  ci.letter7, ci.letter8, ci.correct_answer, aci.my_answer FROM "compare_items" AS ci
+    SELECT ci.id, ci.letter1, ci.letter2,  ci.letter3, ci.letter4, ci.letter5, ci.letter6,  ci.letter7, ci.letter8, ci.correct_answer, aci.my_answer, aci.tests_number FROM "compare_items" AS ci
     LEFT JOIN "answers_compare_items" AS aci 
     ON ci.id=aci.id_compare_items
     LEFT JOIN "users" AS u
