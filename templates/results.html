@@ -11,6 +11,15 @@
 <div class="container mt-5">
     <div class="row d-flex justify-content-center">
         <div class="col-md-8 border p-4">
+            {% if messages %}
+            <div class="alert alert-danger">{{ messages[0] }}</div>
+            {% endif %}
+            <div class="btn-group" role="group">
+                <a href="/" class="btn btn-outline-success"> Strona główna </a>
+                <form method="post" action="">
+                    <input type="submit" class="btn btn-outline-success" value="Wyślij wyniki na maila">
+                </form>
+            </div>
             <h2 class="text-center mb-5">Test 1 Rozumowanie</h2>
             <table class="table table-bordered">
                 <thead>
@@ -26,15 +35,14 @@
 
                 {%for a in answers_reasoning%}
                 <tr>
-                    <th>{{a[5]}}</th>
-
+                    <th>{{a[4]}}</th>
+                    <td>{{a[0]}}</td>
                     <td>{{a[1]}}</td>
                     <td>{{a[2]}}</td>
-                    <td>{{a[3]}}</td>
-                    <td>{% if a[3]==a[4] %}
-                        {{ a[4] }} &#10004;
+                    <td>{% if a[3]==a[2] %}
+                        {{ a[3] }} &#10004;
                         {%else%}
-                        {{ a[4] }} &#10060;
+                        {{ a[3] }} &#10060;
                         {%endif%}
                     </td>
                 </tr>
@@ -59,8 +67,8 @@
                 {%for a in answers_compare_items%}
                 <tr>
                     <th>{{a[11]}}</th>
-                    <td>[{{a[1]}}, {{a[2]}}, {{a[3]}}, {{a[4]}}]</td>
-                    <td>[{{a[5]}}, {{a[6]}}, {{a[7]}}, {{a[8]}}]</td>
+                    <td>({{a[1]}}, {{a[2]}}, {{a[3]}}, {{a[4]}})</td>
+                    <td>({{a[5]}}, {{a[6]}}, {{a[7]}}, {{a[8]}})</td>
                     <td>{{a[9]}}</td>
                     <td>{% if a[9]==a[10] %}
                         {{ a[10] }} &#10004;
@@ -73,7 +81,7 @@
 
                 </tbody>
             </table>
-            <a href="/" class="btn btn-success btn-sm"> Strona główna </a>
+
 
         </div>
     </div>

@@ -1,6 +1,6 @@
 import smtplib
 import sqlite3
-from flask import Flask, session, render_template
+from flask import Flask, session, render_template, request, redirect, get_flashed_messages, flash
 from fpdf import FPDF, XPos, YPos
 from os.path import basename
 from email.mime.text import MIMEText
@@ -30,85 +30,82 @@ def welcome():
     return render_template('welcome.html', user=user)
 
 
-@app.route('/results', endpoint='results')
+@app.route('/results', methods=['GET', 'POST'], endpoint='results')
 @login_required
 def results():
-    answers_reasoning = results_reasoning()
-    answers_compare_items = results_compare_items()
+    if request.method == 'GET':
+        messages = get_flashed_messages()
+        answers_reasoning = results_reasoning()
+        answers_compare_items = results_compare_items()
 
-    return render_template('results.html', answers_reasoning=answers_reasoning,
-                           answers_compare_items=answers_compare_items)
+        return render_template('results.html', answers_reasoning=answers_reasoning,
+                               answers_compare_items=answers_compare_items, messages=messages)
+    if request.method == 'POST':
+        answers_reasoning = results_reasoning_pdf()
+        answers_compare_items = results_compare_items_pdf()
 
-
-@app.route('/send_email', endpoint='send_email')
-@login_required
-def send_email():
-    answers_reasoning = results_reasoning_pdf()
-    answers_compare_items = results_compare_items_pdf()
-
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.add_font('DejaVu', fname='DejaVuSansCondensed.ttf')
-    pdf.set_font('DejaVu', size=10)
-    line_height = pdf.font_size * 2.5
-    col_width = pdf.epw / 5
-    pdf.cell(0, 0, 'TEST ROZUMOWANIE', align='C', new_x=XPos.RIGHT, new_y=YPos.TOP)
-    pdf.ln(line_height)
-    heading = ['Nr testu', 'Twierdzenie', 'Pytanie', 'Poprawna odp.', 'Twoja odp.']
-    for item in heading:
-        pdf.multi_cell(col_width, line_height, item,
-                       new_x=XPos.RIGHT, new_y=YPos.TOP, max_line_height=pdf.font_size)
-    pdf.ln(line_height)
-    for item in answers_reasoning:
-        for el in item:
-            el = str(el)
-            pdf.multi_cell(col_width, line_height, el, border=1,
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.add_font('DejaVu', fname='DejaVuSansCondensed.ttf')
+        pdf.set_font('DejaVu', size=10)
+        line_height = pdf.font_size * 2.5
+        col_width = pdf.epw / 5
+        pdf.cell(0, 0, 'TEST ROZUMOWANIE', align='C', new_x=XPos.RIGHT, new_y=YPos.TOP)
+        pdf.ln(line_height)
+        heading = ['Nr testu', 'Twierdzenie', 'Pytanie', 'Poprawna odp.', 'Twoja odp.']
+        for item in heading:
+            pdf.multi_cell(col_width, line_height, item,
                            new_x=XPos.RIGHT, new_y=YPos.TOP, max_line_height=pdf.font_size)
         pdf.ln(line_height)
-    pdf.ln(line_height)
-    pdf.ln(line_height)
-
-    pdf.cell(0, 0, 'TEST PORÓWNYWANIE ELEMENTÓW', align='C', new_x=XPos.RIGHT, new_y=YPos.TOP)
-    pdf.ln(line_height)
-    heading = ['Nr testu', 'Litery 1', 'Litery 2', 'Poprawna odp.', 'Twoja odp.']
-    for item in heading:
-        pdf.multi_cell(col_width, line_height, item,
-                       new_x=XPos.RIGHT, new_y=YPos.TOP, max_line_height=pdf.font_size)
-    pdf.ln(line_height)
-    for item in answers_compare_items:
-        for el in item:
-            el = str(el)
-            pdf.multi_cell(col_width, line_height, el, border=1,
-                           new_x=XPos.RIGHT, new_y=YPos.TOP, max_line_height=pdf.font_size)
+        for item in answers_reasoning:
+            for el in item:
+                el = str(el)
+                pdf.multi_cell(col_width, line_height, el, border=1,
+                               new_x=XPos.RIGHT, new_y=YPos.TOP, max_line_height=pdf.font_size)
+            pdf.ln(line_height)
+        pdf.ln(line_height)
         pdf.ln(line_height)
 
-    pdf.output('pdf_results.pdf')
+        pdf.cell(0, 0, 'TEST PORÓWNYWANIE ELEMENTÓW', align='C', new_x=XPos.RIGHT, new_y=YPos.TOP)
+        pdf.ln(line_height)
+        heading = ['Nr testu', 'Litery 1', 'Litery 2', 'Poprawna odp.', 'Twoja odp.']
+        for item in heading:
+            pdf.multi_cell(col_width, line_height, item,
+                           new_x=XPos.RIGHT, new_y=YPos.TOP, max_line_height=pdf.font_size)
+        pdf.ln(line_height)
+        for item in answers_compare_items:
+            for el in item:
+                el = str(el)
+                pdf.multi_cell(col_width, line_height, el, border=1,
+                               new_x=XPos.RIGHT, new_y=YPos.TOP, max_line_height=pdf.font_size)
+            pdf.ln(line_height)
 
-    msg = MIMEMultipart()
-    msg['Subject'] = 'Wynik testu'
-    msg['From'] = 'Testy GIA'
-    msg['To'] = session['email_address']
+        pdf.output('pdf_results.pdf')
 
-    content = '''Witaj
+        msg = MIMEMultipart()
+        msg['Subject'] = 'Wynik testu'
+        msg['From'] = 'Testy'
+        msg['To'] = session['email_address']
 
-    W załączniku przesyłamy wyniki testów.
+        content = '''Witaj
 
-    Miłego dnia,
-    Testy GIA'''
-    body = MIMEText(content, 'plain')
-    msg.attach(body)
+            W załączniku przesyłamy wyniki testów.
 
-    compare_items_file = 'pdf_results.pdf'
-    with open(compare_items_file, mode='rb') as f:
-        part = MIMEApplication(f.read(), Name=basename(compare_items_file))
-        part['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(compare_items_file))
-    msg.attach(part)
+            Miłego dnia!'''
+        body = MIMEText(content, 'plain')
+        msg.attach(body)
 
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        smtp.login(user, password)
-        smtp.send_message(msg)
+        compare_items_file = 'pdf_results.pdf'
+        with open(compare_items_file, mode='rb') as f:
+            part = MIMEApplication(f.read(), Name=basename(compare_items_file))
+            part['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(compare_items_file))
+        msg.attach(part)
 
-    return ('wysłany mail')
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(user, password)
+            smtp.send_message(msg)
+        flash('Mail został wysłany')
+        return redirect('/results')
 
 
 if __name__ == '__main__':
