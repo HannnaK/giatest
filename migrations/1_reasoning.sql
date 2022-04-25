@@ -21,7 +21,7 @@ VALUES (NULL, 'Darek jest nie taki ciê¿ki jak Bogdan.', 'Kto jest ciê¿szy?', 'Bo
 (NULL, 'Janusz jest m¹drzejszy ni¿ Eryk.', 'Kto jest m¹drzejszy.', 'Eryk', 'Janusz', 'Janusz'),
 (NULL, 'Tomek jest weselszy ni¿ Marek.',  'Kto jest weselszy?', 'Marek', 'Tomek', 'Tomek'),
 (NULL, 'Marcin jest wy¿szy ni¿ Jan.', 'Kto jest ni¿szy?', 'Marcin', 'Jan', 'Jan'),
-(NULL, 'Julian jest l¿ejszy ni¿ Bartek.', 'Kto jest ciê¿szy?', 'Bartek', 'Bartek', 'Julian'),
-(NULL, 'Bogdan jest nie tak weso³y jak Janusz.', 'Kto jest weselszy?', 'Janusz', 'Janusz', 'Bogdan'),
+(NULL, 'Julian jest l¿ejszy ni¿ Bartek.', 'Kto jest ciê¿szy?', 'Bartek', 'Julian', 'Julian'),
+(NULL, 'Bogdan jest nie tak weso³y jak Janusz.', 'Kto jest weselszy?', 'Janusz', 'Bogdan', 'Bogdan'),
 (NULL, 'Marcin jest m¹drzejszy ni¿ Pawe³.', 'Kto jest g³upszy?', 'Pawe³', 'Marcin', 'Pawe³');
 
