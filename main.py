@@ -83,8 +83,8 @@ def results():
         pdf.output('pdf_results.pdf')
 
         msg = MIMEMultipart()
-        msg['Subject'] = 'Wynik testu'
-        msg['From'] = 'Testy'
+        msg['Subject'] = 'Wyniki testów'
+        msg['From'] = 'Wyniki testów'
         msg['To'] = session['email_address']
 
         content = '''Witaj
