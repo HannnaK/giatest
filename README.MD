@@ -13,7 +13,3 @@
 **Launching the app:**
 - run the application using the main.py file
 
-**Application page:**
-- register and take the tests on the site:
-
-  https://testy-na-inteligencje.herokuapp.com/
